@@ -65,6 +65,7 @@ a{
   background-color: #F9F9F9;
   position: fixed;
   display: none;
+  border: 1px solid #f0f0f0;
   box-shadow: 0 0 1px 0 rgba(76,85,101,0.2), 0 2px 7px 0 rgba(76,85,101,0.2) !important;
   z-index: 10000;
   flex-direction: column;

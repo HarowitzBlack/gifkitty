@@ -38,17 +38,16 @@ function GifPopupProperties(){
   this.show = function(textbox){
 
     currentTextBox = textbox;
-
     let textboxCount = currentTextBox.value.split(" ");
     let last_element = textboxCount[textboxCount.length - 1];
     textboxCount = [];
-    let caret = getCaretCoordinates(currentTextBox, currentTextBox.selectionEnd);
+
+    let textboxRect = currentTextBox.getBoundingClientRect();
 
     if (last_element == "$:") {
-      console.log("NICE!");
 
-      gifPopup.style.top = caret.top + 40 + "px";
-      gifPopup.style.left = caret.left + "px";
+      gifPopup.style.top = textboxRect.bottom + 10 + "px";
+      gifPopup.style.left = textboxRect.left + "px";
       gifPopup.style.display = "flex";
 
     }
@@ -62,7 +61,7 @@ function GifPopupProperties(){
   },
 
   // generates gif image cards and adds them to the container
-  this.MakeGif = function(url){
+  this.MakeGif = function(url,big_img){
     let img_ele = document.createElement("img");
     img_ele.src = url;
     img_ele.classList.add("gk_gif_images");
@@ -70,7 +69,7 @@ function GifPopupProperties(){
     img_ele.onclick = function(e){
       // add the url to the text box
       console.log(currentTextBox);
-      currentTextBox.value = currentTextBox.value.replace("$:",url);
+      currentTextBox.value = currentTextBox.value.replace("$:",big_img);
       gifPopup.style.display = "none";
     }
     gifImageContainer.append(img_ele);
@@ -80,27 +79,57 @@ function GifPopupProperties(){
 
 let gifKittyBox = new GifPopupProperties();
 
+
+// this is the part that slows down everything
+
 let mutationObserver = new MutationObserver(function(mutations) {
+  //console.log(mutations);
+  console.log("triggered!");
+  mutations.forEach(function(mutation){
+    if (mutation.addedNodes.length) {
+      // console.log("New elements added");
+      // console.log(mutation.addedNodes[0].elements);
+      mutated_elements = mutation.addedNodes[0].elements;
+      //console.log(mutated_elements);
+      if (mutated_elements != undefined) {
+        console.log(mutated_elements);
+        for (m of mutated_elements) {
+          let classAr = m.className.split(" ");
+          console.log(classAr);
+          if (classAr.includes("rta__textarea")) {
 
-  let all_txt = document.querySelectorAll(".rta__textarea");
+            m.addEventListener("input",function(e){
+              console.log("passing it in", m.value);
+              gifKittyBox.show(m)
+            })
 
-  all_txt.forEach(function(current_box){
-    current_box.addEventListener("keyup", function(e){
-        gifKittyBox.show(current_box)
-    });
+          }
+        }
+      }
+    }
+
   })
 
-  console.log("DOM has changed!");
+  // v1 - bad
+  // let all_txt = document.querySelectorAll(".rta__textarea");
+  //
+  // all_txt.forEach(function(current_box){
+  //   current_box.addEventListener("keyup", function(e){
+  //       gifKittyBox.show(current_box)
+  //   });
+  // })
+
+  //console.log("DOM has changed!");
 });
 
 // mutation observer configs
 mutationObserver.observe(document.documentElement, {
-  attributes: true,
-  characterData: true,
+  attributes: false,
+  characterData: false,
   childList: true,
   subtree: true,
-  attributeOldValue: true,
-  characterDataOldValue: true
+  attributeOldValue: false,
+  characterDataOldValue: false
 });
 
 
@@ -112,7 +141,6 @@ let xbtn = document.querySelector(".gk_xbtn");
 // for when the page is static and doesn't have any dom changes
 for (let count=0; count < txt_area.length; count++) {
   let current_box = txt_area[count];
-  console.log("OK");
 
   current_box.addEventListener("keyup", function(e){
       gifKittyBox.show(current_box)
@@ -165,6 +193,8 @@ function search_for(gif_endpoint){
   // })
 }
 
+
+
 function generateGifs(gif_data){
 
   for (let gif_count in gif_data) {
@@ -172,7 +202,9 @@ function generateGifs(gif_data){
     let len_gifar = gif_data[gif_count].length;
     for (let i = 0; i < len_gifar; i++) {
       let img_url = gif_data[gif_count][i]["images"]["preview_gif"]["url"];
-      gifKittyBox.MakeGif(img_url);
+      let big_img = gif_data[gif_count][i]["images"]["downsized_medium"]["url"]
+      console.log(gif_data[gif_count][i]["images"]);
+      gifKittyBox.MakeGif(img_url,big_img);
     }
   }
 
