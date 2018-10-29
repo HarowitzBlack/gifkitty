@@ -1,0 +1,56 @@
+
+
+
+// v1 - bad
+// let all_txt = document.querySelectorAll(".rta__textarea");
+//
+// all_txt.forEach(function(current_box){
+//   current_box.addEventListener("keyup", function(e){
+//       gifKittyBox.show(current_box)
+//   });
+// })
+
+//console.log("DOM has changed!");
+
+
+
+// V2 - OK
+// This only works for any action that's taken by the user
+// like clicking on the reply button
+// this doesn't work for the first textbox in the popup
+// if (mutation.addedNodes.length) {
+//   // console.log("New elements added");
+//   console.log(mutation.addedNodes);
+//   mutated_elements = mutation.addedNodes[0].elements;
+//   //console.log(mutated_elements);
+//   if (mutated_elements != undefined) {
+//     console.log(mutated_elements);
+//     for (m of mutated_elements) {
+//       let classAr = m.className.split(" ");
+//       if (classAr.includes("rta__textarea")) {
+//         console.log("Yeay it's ", m.value);
+//         let currentBox = m;
+//         currentBox.addEventListener("keyup",function(e){
+//           //console.log("passing it in", currentBox);
+//           gifKittyBox.show(currentBox)
+//         })
+//
+//       }
+//     }
+//   }
+// }
+
+
+// for static PH pages
+
+// This is for the static page case. Sometimes PH shows the product in
+// a completely different page, this should handle that
+// for (let count=0; count < txt_area.length; count++) {
+//   let current_box = txt_area[count];
+//
+//   current_box.addEventListener("keyup", function(e){
+//       gifKittyBox.show(current_box)
+//
+//   });
+//
+// }

@@ -1,4 +1,24 @@
 
+/*
+
+
+# Gif Picker for Product Hunt because nobody built one for it!
+
+
+# Word of Warning
+
+My JS is shit and if you die by looking at it, tell your family
+that I'm not responsible!
+
+Signed by
+  - harowitzblack
+
+*/
+
+
+
+// adds the popup into the current page that's loaded (works only for ProductHunt)
+
 $("body").append(`
 
   <aside id="gk_popup">
@@ -44,8 +64,8 @@ function GifPopupProperties(){
 
     let textboxRect = currentTextBox.getBoundingClientRect();
 
-    if (last_element == "$:") {
-
+    if (last_element === "$:") {
+      console.log(textboxRect);
       gifPopup.style.top = textboxRect.bottom + 10 + "px";
       gifPopup.style.left = textboxRect.left + "px";
       gifPopup.style.display = "flex";
@@ -84,47 +104,26 @@ let gifKittyBox = new GifPopupProperties();
 
 let mutationObserver = new MutationObserver(function(mutations) {
   //console.log(mutations);
-  console.log("triggered!");
+
   mutations.forEach(function(mutation){
-    if (mutation.addedNodes.length) {
-      // console.log("New elements added");
-      // console.log(mutation.addedNodes[0].elements);
-      mutated_elements = mutation.addedNodes[0].elements;
-      //console.log(mutated_elements);
-      if (mutated_elements != undefined) {
-        console.log(mutated_elements);
-        for (m of mutated_elements) {
-          let classAr = m.className.split(" ");
-          console.log(classAr);
-          if (classAr.includes("rta__textarea")) {
-
-            m.addEventListener("input",function(e){
-              console.log("passing it in", m.value);
-              gifKittyBox.show(m)
-            })
-
-          }
-        }
+    // code to detect changes in the first textbox
+    if (mutation.type === "attributes") {
+      if (mutation.target.className.split(" ").includes("rta__textarea")) {
+        console.log("fine");
+        let currentTextBox = mutation.target;
+        currentTextBox.addEventListener("keyup",function(e){
+          gifKittyBox.show(currentTextBox)
+        })
       }
     }
-
   })
 
-  // v1 - bad
-  // let all_txt = document.querySelectorAll(".rta__textarea");
-  //
-  // all_txt.forEach(function(current_box){
-  //   current_box.addEventListener("keyup", function(e){
-  //       gifKittyBox.show(current_box)
-  //   });
-  // })
 
-  //console.log("DOM has changed!");
 });
 
 // mutation observer configs
 mutationObserver.observe(document.documentElement, {
-  attributes: false,
+  attributes: true,
   characterData: false,
   childList: true,
   subtree: true,
@@ -138,22 +137,9 @@ let search_field = document.querySelector("#gk_search_bar");
 let xbtn = document.querySelector(".gk_xbtn");
 
 
-// for when the page is static and doesn't have any dom changes
-for (let count=0; count < txt_area.length; count++) {
-  let current_box = txt_area[count];
-
-  current_box.addEventListener("keyup", function(e){
-      gifKittyBox.show(current_box)
-
-  });
-
-}
-
-
 search_field.addEventListener("keyup", function(event){
 
   if (event.keyCode == 13) {
-    console.log("ok searching");
     gifKittyBox.ClearGifBox();
 
     let query = search_field.value.split(" ").join("%20");
@@ -164,12 +150,10 @@ search_field.addEventListener("keyup", function(event){
   }
 })
 
-// hide the container
+// hide the gif popup on close
 xbtn.addEventListener("click",function(e){
-  console.log("click");
   gifKittyBox.hide()
 });
-
 
 
 // search function
@@ -183,22 +167,14 @@ function search_for(gif_endpoint){
       generateGifs(data);
     }
   })
-
-  // fetch(gif_endpoint)
-  // .then(data => data.json())
-  // .then(function(gif_data){
-  //
-  //   generateGifs(gif_data)
-  //
-  // })
+  // no fetch cause it doest work
 }
 
 
-
+// generate the freaking gif cards!!!
 function generateGifs(gif_data){
 
   for (let gif_count in gif_data) {
-    // console.log(gif_data[gif_count]);
     let len_gifar = gif_data[gif_count].length;
     for (let i = 0; i < len_gifar; i++) {
       let img_url = gif_data[gif_count][i]["images"]["preview_gif"]["url"];
@@ -207,5 +183,4 @@ function generateGifs(gif_data){
       gifKittyBox.MakeGif(img_url,big_img);
     }
   }
-
 }
