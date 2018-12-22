@@ -19,8 +19,9 @@ Signed by
 
 // adds the popup into the current page that's loaded (works only for ProductHunt)
 
+console.log("THISSSS!",browser.runtime.getURL("giphy.png"));
 
-const giphyImgUrl = chrome.runtime.getURL("giphy.png");
+const giphyImgUrl = browser.runtime.getURL("giphy.png");
 
 let popUpBox = `
 
@@ -68,25 +69,17 @@ function GifPopupProperties(){
   this.show = function(textbox){
 
     currentTextBox = textbox;
-    let textboxCount = currentTextBox.value.split(/\s+/);
+    let textboxCount = currentTextBox.value.split(" ");
     let last_element = textboxCount[textboxCount.length - 1];
     textboxCount = [];
+    console.log("ok");
     let textboxRect = currentTextBox.getBoundingClientRect();
 
     if (last_element === "$:") {
-      //console.log(textboxRect);
-
-      let elementLeft,elementTop; //x and y
-      let scrollTop = document.documentElement.scrollTop?
-                      document.documentElement.scrollTop:document.body.scrollTop;
-      let scrollLeft = document.documentElement.scrollLeft?
-                       document.documentElement.scrollLeft:document.body.scrollLeft;
-      elementTop = textboxRect.top + scrollTop;
-      elementLeft = textboxRect.left + scrollLeft;
-
-      gifPopup.style.top = elementTop + 40 + "px";
+      gifPopup.style.top = textboxRect.bottom + 10 + "px";
       gifPopup.style.left = textboxRect.left + "px";
       gifPopup.style.display = "flex";
+
     }
   },
 
@@ -104,12 +97,14 @@ function GifPopupProperties(){
     img_ele.classList.add("gk_gif_images");
     img_ele.onclick = function(e){
       // add the url to the text box
+      console.log(currentTextBox);
       currentTextBox.value = currentTextBox.value.replace("$:",big_img);
       gifPopup.style.display = "none";
     }
     gifImageContainer.append(img_ele);
   }
 }
+
 
 let gifKittyBox = new GifPopupProperties();
 
@@ -124,13 +119,13 @@ let mutationObserver = new MutationObserver(function(mutations) {
     if (mutation.type === "attributes") {
       if (mutation.target.className.split(" ").includes("rta__textarea")) {
         let currentTextBox = mutation.target;
-        // console.log(currentTextBox);
         currentTextBox.addEventListener("keyup",function(e){
           gifKittyBox.show(currentTextBox)
         })
       }
     }
   })
+
 
 });
 
@@ -157,7 +152,7 @@ search_field.addEventListener("keyup", function(event){
 
     let query = search_field.value.split(" ").join("%20");
     const api_key = "NTsd5Y09pIR3j37RFdRGpqaV23KiVHfS";
-    let endpoint = `https://api.giphy.com/v1/gifs/search?api_key=${api_key}&q=${query}`;
+    let endpoint = `http://api.giphy.com/v1/gifs/search?api_key=${api_key}&q=${query}`;
     search_for(endpoint);
 
   }
